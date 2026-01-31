@@ -447,8 +447,12 @@
     }
   },
   "libraries": {
-    "pinned_footprint_libs": [],
-    "pinned_symbol_libs": []
+    "pinned_footprint_libs": [
+      "acv"
+    ],
+    "pinned_symbol_libs": [
+      "acv"
+    ]
   },
   "meta": {
     "filename": "acv.kicad_pro",
