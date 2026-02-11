@@ -16,6 +16,10 @@
 #include "lwip/apps/netbiosns.h"
 #include "protocol_examples_common.h"
 
+#include "freertos/task.h"
+#include "twai.h"
+#include "led.h"
+
 #define ESP_WIFI_SSID "acv"
 #define ESP_WIFI_PASS "password"
 
@@ -120,8 +124,10 @@ esp_err_t init_fs(void)
     return ESP_OK;
 }
 
-void app_main(void)
-{
+void app_main(void) {
+    xTaskCreate(twai_task, "twai_task", 2048, NULL, 5, NULL);
+    xTaskCreate(led_task, "led_task", 2048, NULL, 5, NULL);
+
     ESP_ERROR_CHECK(nvs_flash_init());
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());

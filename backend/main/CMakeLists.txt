@@ -1,6 +1,6 @@
-idf_component_register(SRCS "esp_rest_main.c"
+idf_component_register(SRCS "led.c" "twai.c" "esp_rest_main.c"
                             "rest_server.c"
-                       PRIV_REQUIRES esp_http_server json esp_wifi esp_netif nvs_flash
+                       PRIV_REQUIRES esp_http_server json esp_wifi esp_netif nvs_flash driver
                        INCLUDE_DIRS ".")
 
 if(CONFIG_EXAMPLE_DEPLOY_WEB_PAGES)
