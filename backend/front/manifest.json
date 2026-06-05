@@ -1,0 +1,14 @@
+{
+  "name": "Automotive CAN bus Visualiser",
+  "short_name": "acv",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "orientation": "landscape-primary",
+  "icons": [
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
