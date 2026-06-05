@@ -37,9 +37,9 @@
         "other_text_thickness": 0.15,
         "other_text_upright": false,
         "pads": {
-          "drill": 0.8,
-          "height": 1.27,
-          "width": 2.54
+          "drill": 1.2,
+          "height": 1.8,
+          "width": 1.8
         },
         "silk_line_width": 0.1,
         "silk_text_italic": false,
@@ -447,12 +447,8 @@
     }
   },
   "libraries": {
-    "pinned_footprint_libs": [
-      "acv"
-    ],
-    "pinned_symbol_libs": [
-      "acv"
-    ]
+    "pinned_footprint_libs": [],
+    "pinned_symbol_libs": []
   },
   "meta": {
     "filename": "acv.kicad_pro",
@@ -491,10 +487,10 @@
       "gencad": "",
       "idf": "",
       "netlist": "",
-      "plot": "",
+      "plot": "gerbers/",
       "pos_files": "",
       "specctra_dsn": "",
-      "step": "",
+      "step": "acv-v1.step",
       "svg": "",
       "vrml": ""
     },
@@ -615,7 +611,7 @@
   },
   "sheets": [
     [
-      "b2ca9fb0-a35f-4499-b995-6512249a25c5",
+      "2e63f749-a44a-437d-9013-0981e84ef556",
       "Root"
     ]
   ],

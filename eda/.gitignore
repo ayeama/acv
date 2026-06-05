@@ -38,3 +38,9 @@ fp-info-cache
 
 # Local project settings
 *.kicad_prl
+
+# Project specific
+datasheets/
+gerbers/
+models/
+*.step

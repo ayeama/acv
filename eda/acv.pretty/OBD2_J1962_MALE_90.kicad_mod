@@ -57,7 +57,7 @@
 	(attr through_hole)
 	(fp_poly
 		(pts
-			(xy -6.5 5) (xy -6.5 -23) (xy 34 -23) (xy 34 5)
+			(xy -6.5 -2) (xy -6.5 -23) (xy 34 -23) (xy 34 -2)
 		)
 		(stroke
 			(width 0.05)
@@ -196,4 +196,15 @@
 		(uuid "701e9dd3-f794-4dc9-84a2-f94e1d7c0f79")
 	)
 	(embedded_fonts no)
+	(model "${KIPRJMOD}/models/C-OBD-II-16M/C-OBD-II-16M.step"
+		(offset
+			(xyz 28 0 -2.4)
+		)
+		(scale
+			(xyz 1 1 1)
+		)
+		(rotate
+			(xyz -90 -0 -180)
+		)
+	)
 )
