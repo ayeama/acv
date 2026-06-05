@@ -82,3 +82,9 @@ Desktop.ini
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
+
+# Project specific
+.vscode/settings.json
+tmp/
+
+front/images/*.webp
