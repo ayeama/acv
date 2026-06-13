@@ -9,11 +9,17 @@
 #define TWAI_RX_PIN GPIO_NUM_5
 #define TWAI_BITRATE 500000
 
-#define TWAI_OBD2_PID_MONITOR_STATUS 1 << 31
+// ZX4RR
+#define FUNCTIONAL_ADDRESS 0x7DF
+#define EXTENDED_FRAME_FORMAT false
 
+// CBR650R
+// #define FUNCTIONAL_ADDRESS 0x18DB33F1
+// #define EXTENDED_FRAME_FORMAT true
 
 typedef struct {
     uint32_t id;
+    uint32_t ide;
     uint8_t data[8];
     uint8_t len;
 } can_msg_t;
@@ -31,6 +37,7 @@ static bool twai_receive_callback(twai_node_handle_t handle, const twai_rx_done_
 
     if (ESP_OK == twai_node_receive_from_isr(handle, &msg)) {
         out.id = msg.header.id;
+        out.ide = msg.header.ide;
         out.len = msg.buffer_len;
 
         // TODO: filter here?
@@ -95,11 +102,6 @@ void twai_rx_task(void *arg) {
 
 
 
-
-
-
-
-
             // if (msg.id == 0x100) {
             //     int16_t test_rpm = ((uint16_t)msg.data[0] << 8) | msg.data[1];
             //     ESP_LOGI("acv", "test_rpm: %d", test_rpm);
@@ -136,8 +138,11 @@ void twai_rx_task(void *arg) {
             //     msg.data[6],
             //     msg.data[7]
             // );
-            
-            if (msg.id == 0x18DAF110) {
+
+            if (
+                (!msg.ide && msg.id == 0x7E8) ||  // 11 bit ID
+                (msg.ide && msg.id == 0x18DAF110) // 29 bit ID, extended frame format
+            ) {
                 if (msg.data[1] == 0x41 && msg.data[2] == 0x05) {
                     int8_t coolant_temp = msg.data[3] - 40;
                     acv_msg_coolant_temp(coolant_temp);
@@ -177,8 +182,8 @@ void twai_tx_task(void *arg) {
         vTaskDelay(pdMS_TO_TICKS(10));
         uint8_t buf_rpm[8] = {0x02, 0x01, 0x0C, 0x55, 0x55, 0x55, 0x55, 0x55};
         twai_frame_t msg_rpm = {
-            .header.id = 0x18DB33F1,
-            .header.ide = true,
+            .header.id = FUNCTIONAL_ADDRESS,
+            .header.ide = EXTENDED_FRAME_FORMAT,
             .buffer = buf_rpm,
             .buffer_len = sizeof(buf_rpm),
         };
@@ -191,8 +196,8 @@ void twai_tx_task(void *arg) {
         vTaskDelay(pdMS_TO_TICKS(10));
         uint8_t buf_coolant_temp[8] = {0x02, 0x01, 0x05, 0x55, 0x55, 0x55, 0x55, 0x55};
         twai_frame_t msg_coolant_temp = {
-            .header.id = 0x18DB33F1,
-            .header.ide = true,
+            .header.id = FUNCTIONAL_ADDRESS,
+            .header.ide = EXTENDED_FRAME_FORMAT,
             .buffer = buf_coolant_temp,
             .buffer_len = sizeof(buf_coolant_temp),
         };
@@ -204,8 +209,8 @@ void twai_tx_task(void *arg) {
         vTaskDelay(pdMS_TO_TICKS(10));
         uint8_t buf_speed[8] = {0x02, 0x01, 0x0D, 0x55, 0x55, 0x55, 0x55, 0x55};
         twai_frame_t msg_speed = {
-            .header.id = 0x18DB33F1,
-            .header.ide = true,
+            .header.id = FUNCTIONAL_ADDRESS,
+            .header.ide = EXTENDED_FRAME_FORMAT,
             .buffer = buf_speed,
             .buffer_len = sizeof(buf_speed),
         };
@@ -217,8 +222,8 @@ void twai_tx_task(void *arg) {
         vTaskDelay(pdMS_TO_TICKS(10));
         uint8_t buf_intake_air_temp[8] = {0x02, 0x01, 0x0F, 0x55, 0x55, 0x55, 0x55, 0x55};
         twai_frame_t msg_intake_air_temp = {
-            .header.id = 0x18DB33F1,
-            .header.ide = true,
+            .header.id = FUNCTIONAL_ADDRESS,
+            .header.ide = EXTENDED_FRAME_FORMAT,
             .buffer = buf_intake_air_temp,
             .buffer_len = sizeof(buf_intake_air_temp),
         };
@@ -230,8 +235,8 @@ void twai_tx_task(void *arg) {
         vTaskDelay(pdMS_TO_TICKS(10));
         uint8_t buf_throttle_position[8] = {0x02, 0x01, 0x11, 0x55, 0x55, 0x55, 0x55, 0x55};
         twai_frame_t msg_throttle_position = {
-            .header.id = 0x18DB33F1,
-            .header.ide = true,
+            .header.id = FUNCTIONAL_ADDRESS,
+            .header.ide = EXTENDED_FRAME_FORMAT,
             .buffer = buf_throttle_position,
             .buffer_len = sizeof(buf_throttle_position),
         };
