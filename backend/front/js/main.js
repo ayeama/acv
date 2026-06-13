@@ -1,11 +1,11 @@
 class Config {
     theme = 'dark';
-    handle = '@zx4rr_gal';
+    handle = '@cbr650r_gal';
     rpm_min = 0;
-    rpm_max = 18000;
+    rpm_max = 15500;
     rpm_idle = 2500;
-    rpm_redline = 16000;
-    rpm_powerband = 12000;
+    rpm_redline = 12250;
+    rpm_powerband = 10000;
 
     constructor() {
         this.set_theme();
@@ -212,8 +212,8 @@ function render_throttle_position() {
     // TODO
     // const throttle_position_min = 0;
     // const throttle_position_max = 100;
-    const throttle_position_min = 12;
-    const throttle_position_max = 44;
+    const throttle_position_min = 9;
+    const throttle_position_max = 92;
 
     throttlePositionText.textContent = `${Math.round(chat.throttle_position)}`;
     throttlePositionProgress.setAttribute('aria-valuenow', `${chat.throttle_position}`);

@@ -137,7 +137,7 @@ void twai_rx_task(void *arg) {
             //     msg.data[7]
             // );
             
-            if (msg.id == 0x7E8) {
+            if (msg.id == 0x18DAF110) {
                 if (msg.data[1] == 0x41 && msg.data[2] == 0x05) {
                     int8_t coolant_temp = msg.data[3] - 40;
                     acv_msg_coolant_temp(coolant_temp);
@@ -149,19 +149,19 @@ void twai_rx_task(void *arg) {
                     acv_msg_rpm(rpm);
                     continue;
                 }
-                
+
                 if (msg.data[1] == 0x41 && msg.data[2] == 0x0D) {
                     int8_t speed = msg.data[3];
                     acv_msg_speed(speed);
                     continue;
                 }
-                
+
                 if (msg.data[1] == 0x41 && msg.data[2] == 0x0F) {
                     int8_t intake_air_temp = msg.data[3] - 40;
                     acv_msg_intake_air_temp(intake_air_temp);
                     continue;
                 }
-                
+
                 if (msg.data[1] == 0x41 && msg.data[2] == 0x11) {
                     float throttle_position = 0.392156863 * msg.data[3];
                     acv_msg_throttle_position(throttle_position);
@@ -177,8 +177,8 @@ void twai_tx_task(void *arg) {
         vTaskDelay(pdMS_TO_TICKS(10));
         uint8_t buf_rpm[8] = {0x02, 0x01, 0x0C, 0x55, 0x55, 0x55, 0x55, 0x55};
         twai_frame_t msg_rpm = {
-            .header.id = 0x7DF,
-            .header.ide = false,
+            .header.id = 0x18DB33F1,
+            .header.ide = true,
             .buffer = buf_rpm,
             .buffer_len = sizeof(buf_rpm),
         };
@@ -191,8 +191,8 @@ void twai_tx_task(void *arg) {
         vTaskDelay(pdMS_TO_TICKS(10));
         uint8_t buf_coolant_temp[8] = {0x02, 0x01, 0x05, 0x55, 0x55, 0x55, 0x55, 0x55};
         twai_frame_t msg_coolant_temp = {
-            .header.id = 0x7DF,
-            .header.ide = false,
+            .header.id = 0x18DB33F1,
+            .header.ide = true,
             .buffer = buf_coolant_temp,
             .buffer_len = sizeof(buf_coolant_temp),
         };
@@ -204,8 +204,8 @@ void twai_tx_task(void *arg) {
         vTaskDelay(pdMS_TO_TICKS(10));
         uint8_t buf_speed[8] = {0x02, 0x01, 0x0D, 0x55, 0x55, 0x55, 0x55, 0x55};
         twai_frame_t msg_speed = {
-            .header.id = 0x7DF,
-            .header.ide = false,
+            .header.id = 0x18DB33F1,
+            .header.ide = true,
             .buffer = buf_speed,
             .buffer_len = sizeof(buf_speed),
         };
@@ -217,8 +217,8 @@ void twai_tx_task(void *arg) {
         vTaskDelay(pdMS_TO_TICKS(10));
         uint8_t buf_intake_air_temp[8] = {0x02, 0x01, 0x0F, 0x55, 0x55, 0x55, 0x55, 0x55};
         twai_frame_t msg_intake_air_temp = {
-            .header.id = 0x7DF,
-            .header.ide = false,
+            .header.id = 0x18DB33F1,
+            .header.ide = true,
             .buffer = buf_intake_air_temp,
             .buffer_len = sizeof(buf_intake_air_temp),
         };
@@ -230,8 +230,8 @@ void twai_tx_task(void *arg) {
         vTaskDelay(pdMS_TO_TICKS(10));
         uint8_t buf_throttle_position[8] = {0x02, 0x01, 0x11, 0x55, 0x55, 0x55, 0x55, 0x55};
         twai_frame_t msg_throttle_position = {
-            .header.id = 0x7DF,
-            .header.ide = false,
+            .header.id = 0x18DB33F1,
+            .header.ide = true,
             .buffer = buf_throttle_position,
             .buffer_len = sizeof(buf_throttle_position),
         };
