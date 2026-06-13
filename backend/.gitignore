@@ -30,7 +30,7 @@ build/
 *.map
 flasher_args.json # Generated in build directory
 sdkconfig.old
-sdkconfig
+# sdkconfig
 
 # ESP-IDF dependencies
 # For older versions or manual component management
@@ -41,7 +41,7 @@ managed_components/
 # If ESP-IDF tools are installed/referenced locally to the project
 .espressif/
 
-dependencies.lock
+# dependencies.lock
 
 # CMake generated files
 CMakeCache.txt
