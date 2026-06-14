@@ -9,13 +9,20 @@
 #define TWAI_RX_PIN GPIO_NUM_5
 #define TWAI_BITRATE 500000
 
-// ZX4RR
-#define FUNCTIONAL_ADDRESS 0x7DF
-#define EXTENDED_FRAME_FORMAT false
+#define FUNCTIONAL_ADDRESS_BASE 0x7DF
+#define FUNCTIONAL_ADDRESS_EXTENDED 0x18DB33F1
 
-// CBR650R
-// #define FUNCTIONAL_ADDRESS 0x18DB33F1
-// #define EXTENDED_FRAME_FORMAT true
+static const uint8_t PID_SUPPORTED[] = {0x02, 0x01, 0x00};
+static const uint8_t PID_COOLANT_TEMP[] = {0x02, 0x01, 0x05};
+static const uint8_t PID_RPM[] = {0x02, 0x01, 0x0C};
+static const uint8_t PID_SPEED[] = {0x02, 0x01, 0x0D};
+static const uint8_t PID_INTAKE_AIR_TEMP[] = {0x02, 0x01, 0x0F};
+static const uint8_t PID_THROTTLE_POSITION[] = {0x02, 0x01, 0x11};
+
+static bool identifier_base_seen = false;
+static bool identifier_extended_seen = false;
+
+static uint32_t supported_pids = 0;
 
 typedef struct {
     uint32_t id;
@@ -64,6 +71,33 @@ void twai_rx_task(void *arg) {
 
     while (1) {
         if (xQueueReceive(msg_queue, &msg, portMAX_DELAY)) {
+            if (
+                !msg.ide &&
+                (msg.id >= 0x7E8 && msg.id <= 0x7EF) &&
+                msg.data[1] == 0x41 &&
+                msg.data[2] == 0x00
+            ) {
+                identifier_base_seen = true;
+                supported_pids =
+                    ((uint32_t)msg.data[3] << 24) |
+                    ((uint32_t)msg.data[4] << 16) |
+                    ((uint32_t)msg.data[5] << 8) |
+                    ((uint32_t)msg.data[6]);
+            }
+            if (
+                msg.ide &&
+                (msg.id >= 0x18DAF100 && msg.id <= 0x18DAF1FF) &&
+                msg.data[1] == 0x41 &&
+                msg.data[2] == 0x00
+            ) {
+                identifier_extended_seen = true;
+                supported_pids =
+                    ((uint32_t)msg.data[3] << 24) |
+                    ((uint32_t)msg.data[4] << 16) |
+                    ((uint32_t)msg.data[5] << 8) |
+                    ((uint32_t)msg.data[6]);
+            }
+
             // if (msg.id == 0x18 && !x18) {
             //     x18 = true;
             //     ESP_LOGI("acv", "seen 0x18: brake and unknown");
@@ -140,8 +174,8 @@ void twai_rx_task(void *arg) {
             // );
 
             if (
-                (!msg.ide && msg.id == 0x7E8) ||  // 11 bit ID
-                (msg.ide && msg.id == 0x18DAF110) // 29 bit ID, extended frame format
+                (!msg.ide && (msg.id >= 0x7E8 && msg.id <= 0x7EF)) ||
+                (msg.ide && (msg.id >= 0x18DAF100 && msg.id <= 0x18DAF1FF))
             ) {
                 if (msg.data[1] == 0x41 && msg.data[2] == 0x05) {
                     int8_t coolant_temp = msg.data[3] - 40;
@@ -177,73 +211,105 @@ void twai_rx_task(void *arg) {
     }
 }
 
-void twai_tx_task(void *arg) {
+void discover_identifier() {
     while (1) {
-        vTaskDelay(pdMS_TO_TICKS(10));
-        uint8_t buf_rpm[8] = {0x02, 0x01, 0x0C, 0x55, 0x55, 0x55, 0x55, 0x55};
-        twai_frame_t msg_rpm = {
-            .header.id = FUNCTIONAL_ADDRESS,
-            .header.ide = EXTENDED_FRAME_FORMAT,
-            .buffer = buf_rpm,
-            .buffer_len = sizeof(buf_rpm),
+        esp_err_t err;
+
+        ESP_LOGI("ACV", "attempting to discover CAN bus identifier...");
+
+        twai_frame_t msg_base = {
+            .header.id = FUNCTIONAL_ADDRESS_BASE,
+            .header.ide = false,
+            .buffer = (uint8_t *)PID_SUPPORTED,
+            .buffer_len = sizeof(PID_SUPPORTED),
         };
-        esp_err_t err = twai_node_transmit(node, &msg_rpm, 0);
+        err = twai_node_transmit(node, &msg_base, 0);
         if (err != ESP_OK) {
             ESP_LOGE("ACV", "transmit failed: %s", esp_err_to_name(err));
         }
-        // ESP_ERROR_CHECK(twai_node_transmit_wait_all_done(node, -1));
-
-        vTaskDelay(pdMS_TO_TICKS(10));
-        uint8_t buf_coolant_temp[8] = {0x02, 0x01, 0x05, 0x55, 0x55, 0x55, 0x55, 0x55};
-        twai_frame_t msg_coolant_temp = {
-            .header.id = FUNCTIONAL_ADDRESS,
-            .header.ide = EXTENDED_FRAME_FORMAT,
-            .buffer = buf_coolant_temp,
-            .buffer_len = sizeof(buf_coolant_temp),
-        };
-        esp_err_t err_coolant_temp = twai_node_transmit(node, &msg_coolant_temp, 0);
-        if (err_coolant_temp != ESP_OK) {
-            ESP_LOGE("ACV", "transmit failed: %s", esp_err_to_name(err_coolant_temp));
+        err = twai_node_transmit_wait_all_done(node, 500);
+        if (err == ESP_OK) {
+            if (identifier_base_seen) {
+                ESP_LOGI("ACV", "CAN bus discovered base identifier, supported pids: %#b", supported_pids);
+                return;
+            }
+        } else if (err == ESP_ERR_TIMEOUT) {
+            ESP_LOGW("ACV", "CAN bus timed out attemping to discover base identifier: %s", esp_err_to_name(err));
+        } else if (err == ESP_ERR_INVALID_STATE) {
+            ESP_LOGE("ACV", "transmit failed: %s", esp_err_to_name(err));
         }
 
-        vTaskDelay(pdMS_TO_TICKS(10));
-        uint8_t buf_speed[8] = {0x02, 0x01, 0x0D, 0x55, 0x55, 0x55, 0x55, 0x55};
-        twai_frame_t msg_speed = {
-            .header.id = FUNCTIONAL_ADDRESS,
-            .header.ide = EXTENDED_FRAME_FORMAT,
-            .buffer = buf_speed,
-            .buffer_len = sizeof(buf_speed),
+        twai_frame_t msg_extended = {
+            .header.id = FUNCTIONAL_ADDRESS_EXTENDED,
+            .header.ide = true,
+            .buffer = (uint8_t *)PID_SUPPORTED,
+            .buffer_len = sizeof(PID_SUPPORTED),
         };
-        esp_err_t err_speed = twai_node_transmit(node, &msg_speed, 0);
-        if (err_speed != ESP_OK) {
-            ESP_LOGE("ACV", "transmit failed: %s", esp_err_to_name(err_speed));
+        err = twai_node_transmit(node, &msg_extended, 0);
+        if (err != ESP_OK) {
+            ESP_LOGE("ACV", "transmit failed: %s", esp_err_to_name(err));
+        }
+        err = twai_node_transmit_wait_all_done(node, 500);
+        if (err == ESP_OK) {
+            if (identifier_extended_seen) {
+                ESP_LOGI("ACV", "CAN bus discovered extended identifier, supported pids: %#b", supported_pids);
+                return;
+            }
+        } else if (err == ESP_ERR_TIMEOUT) {
+            ESP_LOGW("ACV", "CAN bus timed out attemping to discover extended identifier: %s", esp_err_to_name(err));
+        } else if (err == ESP_ERR_INVALID_STATE) {
+            ESP_LOGE("ACV", "transmit failed: %s", esp_err_to_name(err));
         }
 
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }    
+}
+
+void query_pid(const uint8_t *query, size_t size) {
+    uint32_t id;
+    uint32_t ide;
+
+    if (identifier_extended_seen) {
+        id = FUNCTIONAL_ADDRESS_EXTENDED;
+        ide = true;
+    } else if (identifier_base_seen) {
+        id = FUNCTIONAL_ADDRESS_BASE;
+        ide = false;
+    } else {
+        // TODO: use assert?
+        return;
+    }
+
+    twai_frame_t msg = {
+        .header.id = id,
+        .header.ide = ide,
+        .buffer = (uint8_t *)query,
+        .buffer_len = size,
+    };
+    esp_err_t err = twai_node_transmit(node, &msg, 0);
+    if (err != ESP_OK) {
+        ESP_LOGE("ACV", "transmit failed: %s", esp_err_to_name(err));
+    }
+}
+
+void twai_tx_task(void *arg) {
+    discover_identifier();
+
+    while (1) {
         vTaskDelay(pdMS_TO_TICKS(10));
-        uint8_t buf_intake_air_temp[8] = {0x02, 0x01, 0x0F, 0x55, 0x55, 0x55, 0x55, 0x55};
-        twai_frame_t msg_intake_air_temp = {
-            .header.id = FUNCTIONAL_ADDRESS,
-            .header.ide = EXTENDED_FRAME_FORMAT,
-            .buffer = buf_intake_air_temp,
-            .buffer_len = sizeof(buf_intake_air_temp),
-        };
-        esp_err_t err_intake_air_temp = twai_node_transmit(node, &msg_intake_air_temp, 0);
-        if (err_intake_air_temp != ESP_OK) {
-            ESP_LOGE("ACV", "transmit failed: %s", esp_err_to_name(err_intake_air_temp));
-        }
+        query_pid(PID_RPM, sizeof(PID_RPM));
 
         vTaskDelay(pdMS_TO_TICKS(10));
-        uint8_t buf_throttle_position[8] = {0x02, 0x01, 0x11, 0x55, 0x55, 0x55, 0x55, 0x55};
-        twai_frame_t msg_throttle_position = {
-            .header.id = FUNCTIONAL_ADDRESS,
-            .header.ide = EXTENDED_FRAME_FORMAT,
-            .buffer = buf_throttle_position,
-            .buffer_len = sizeof(buf_throttle_position),
-        };
-        esp_err_t err_throttle_position = twai_node_transmit(node, &msg_throttle_position, 0);
-        if (err_throttle_position != ESP_OK) {
-            ESP_LOGE("ACV", "transmit failed: %s", esp_err_to_name(err_throttle_position));
-        }
+        query_pid(PID_COOLANT_TEMP, sizeof(PID_COOLANT_TEMP));
+
+        vTaskDelay(pdMS_TO_TICKS(10));
+        query_pid(PID_SPEED, sizeof(PID_SPEED));
+
+        vTaskDelay(pdMS_TO_TICKS(10));
+        query_pid(PID_INTAKE_AIR_TEMP, sizeof(PID_INTAKE_AIR_TEMP));
+
+        vTaskDelay(pdMS_TO_TICKS(10));
+        query_pid(PID_THROTTLE_POSITION, sizeof(PID_THROTTLE_POSITION));
     }
 }
 
