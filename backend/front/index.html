@@ -180,46 +180,54 @@
             Settings saved
           </div>
 
-          <form>
-            <div class="overflow-hidden">
-              <div class="row gy-3">
-                <div class="col col-4">
-                  <label for="inputHandle" class="form-label">Handle</label>
-                  <input type="text" class="form-control" id="inputHandle">
-                </div>
+          <div class="overflow-hidden">
+            <div class="row row-cols-2 row-cols-sm-3 gy-3">
+              <div class="col">
+                <label for="inputHandle" class="form-label">Handle</label>
+                <input type="text" class="form-control" id="inputHandle">
+              </div>
 
-                <div class="col col-4">
-                  <label for="inputRpmMin" class="form-label">RPM Minimum</label>
-                  <input type="number" class="form-control" id="inputRpmMin">
-                </div>
+              <div class="col">
+                <label for="inputRpmMin" class="form-label">RPM Minimum</label>
+                <input type="number" class="form-control" id="inputRpmMin">
+              </div>
 
-                <div class="col col-4">
-                  <label for="inputRpmMax" class="form-label">RPM Maximum</label>
-                  <input type="number" class="form-control" id="inputRpmMax">
-                </div>
+              <div class="col">
+                <label for="inputRpmMax" class="form-label">RPM Maximum</label>
+                <input type="number" class="form-control" id="inputRpmMax">
+              </div>
 
-                <div class="col col-4">
-                  <label for="inputRpmIdle" class="form-label">RPM Idle</label>
-                  <input type="number" class="form-control" id="inputRpmIdle">
-                </div>
+              <div class="col">
+                <label for="inputRpmIdle" class="form-label">RPM Idle</label>
+                <input type="number" class="form-control" id="inputRpmIdle">
+              </div>
+              
+              <div class="col">
+                <label for="inputRpmPowerband" class="form-label">RPM Powerband</label>
+                <input type="number" class="form-control" id="inputRpmPowerband">
+              </div>
 
-                <div class="col col-4">
-                  <label for="inputRpmRedline" class="form-label">RPM Redline</label>
-                  <input type="number" class="form-control" id="inputRpmRedline">
-                </div>
+              <div class="col">
+                <label for="inputRpmRedline" class="form-label">RPM Redline</label>
+                <input type="number" class="form-control" id="inputRpmRedline">
+              </div>
 
-                <div class="col col-4">
-                  <label for="inputRpmPowerband" class="form-label">RPM Powerband</label>
-                  <input type="number" class="form-control" id="inputRpmPowerband">
-                </div>
+              <div class="col">
+                <label for="inputThrottlePositionMin" class="form-label">Throttle Position Min</label>
+                <input type="number" class="form-control" id="inputThrottlePositionMin">
+              </div>
+
+              <div class="col">
+                <label for="inputThrottlePositionMax" class="form-label">Throttle Position Max</label>
+                <input type="number" class="form-control" id="inputThrottlePositionMax">
               </div>
             </div>
-          </form>
+          </div>
         </div>
 
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button id="buttonSave" type="button" class="btn btn-primary">Save changes</button>
+          <button id="buttonSave" type="button" class="btn btn-primary">Save</button>
         </div>
       </div>
     </div>

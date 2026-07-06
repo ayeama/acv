@@ -4,8 +4,10 @@ const inputHandle = document.getElementById('inputHandle');
 const inputRpmMin = document.getElementById('inputRpmMin');
 const inputRpmMax = document.getElementById('inputRpmMax');
 const inputRpmIdle = document.getElementById('inputRpmIdle');
-const inputRpmRedline = document.getElementById('inputRpmRedline');
 const inputRpmPowerband = document.getElementById('inputRpmPowerband');
+const inputRpmRedline = document.getElementById('inputRpmRedline');
+const inputThrottlePositionMin = document.getElementById('inputThrottlePositionMin');
+const inputThrottlePositionMax = document.getElementById('inputThrottlePositionMax');
 
 class Config {
     constructor() {
@@ -14,8 +16,10 @@ class Config {
         this.rpm_min = 0;
         this.rpm_max = 18000;
         this.rpm_idle = 2500;
-        this.rpm_redline = 16000;
         this.rpm_powerband = 11500;
+        this.rpm_redline = 16000;
+        this.throttle_position_min = 12;
+        this.throttle_position_max = 44;
 
         this.load()
         this.populate()
@@ -40,8 +44,10 @@ class Config {
         inputRpmMin.value = this.rpm_min;
         inputRpmMax.value = this.rpm_max;
         inputRpmIdle.value = this.rpm_idle;
-        inputRpmRedline.value = this.rpm_redline;
         inputRpmPowerband.value = this.rpm_powerband;
+        inputRpmRedline.value = this.rpm_redline;
+        inputThrottlePositionMin.value = this.throttle_position_min;
+        inputThrottlePositionMax.value = this.throttle_position_max;
 
         document.getElementById('handle').textContent = inputHandle.value;
     }
@@ -51,8 +57,10 @@ class Config {
         this.rpm_min = Number(inputRpmMin.value)
         this.rpm_max = Number(inputRpmMax.value)
         this.rpm_idle = Number(inputRpmIdle.value)
-        this.rpm_redline = Number(inputRpmRedline.value)
         this.rpm_powerband = Number(inputRpmPowerband.value)
+        this.rpm_redline = Number(inputRpmRedline.value)
+        this.throttle_position_min = Number(inputThrottlePositionMin.value)
+        this.throttle_position_max = Number(inputThrottlePositionMax.value)
     }
 }
 
@@ -247,11 +255,8 @@ function render_intake_air_temp() {
 }
 
 function render_throttle_position() {
-    // TODO
-    // const throttle_position_min = 0;
-    // const throttle_position_max = 100;
-    const throttle_position_min = 9;
-    const throttle_position_max = 92;
+    const throttle_position_min = config.throttle_position_min;
+    const throttle_position_max = config.throttle_position_max;
 
     throttlePositionText.textContent = `${Math.round(chat.throttle_position)}`;
     throttlePositionProgress.setAttribute('aria-valuenow', `${chat.throttle_position}`);
@@ -272,7 +277,6 @@ function render_animation() {
         return;
     }
 
-    // TODO update powerband?
     const frames = 16;
     let normalized = (chat.rpm - config.rpm_idle) / (config.rpm_powerband - config.rpm_idle);
     normalized = Math.max(0, Math.min(1, normalized));
