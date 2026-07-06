@@ -1,6 +1,9 @@
 #ifndef ACV_H
 #define ACV_H
 
+#include <stdbool.h>
+#include <stddef.h>
+
 typedef struct {
     bool updated;
     int8_t coolant_temp;

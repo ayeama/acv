@@ -1,3 +1,7 @@
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdio.h>
+
 #include <acv.h>
 
 acv_msg_t acv_msg = {0};

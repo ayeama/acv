@@ -1,27 +1,74 @@
+CONFIG_KEY = "acv.config"
+
+const inputHandle = document.getElementById('inputHandle');
+const inputRpmMin = document.getElementById('inputRpmMin');
+const inputRpmMax = document.getElementById('inputRpmMax');
+const inputRpmIdle = document.getElementById('inputRpmIdle');
+const inputRpmRedline = document.getElementById('inputRpmRedline');
+const inputRpmPowerband = document.getElementById('inputRpmPowerband');
+
 class Config {
-    theme = 'dark';
-    handle = '@cbr650r_gal';
-    rpm_min = 0;
-    rpm_max = 15500;
-    rpm_idle = 2500;
-    rpm_redline = 12250;
-    rpm_powerband = 10000;
-
     constructor() {
-        this.set_theme();
-        this.set_handle();
+        this.theme = 'dark';
+        this.handle = '@zx4rr_gal';
+        this.rpm_min = 0;
+        this.rpm_max = 18000;
+        this.rpm_idle = 2500;
+        this.rpm_redline = 16000;
+        this.rpm_powerband = 11500;
+
+        this.load()
+        this.populate()
+    }
+    
+    load() {
+        const json = localStorage.getItem(CONFIG_KEY)
+        
+        if (!json) {
+            return;
+        }
+        
+        Object.assign(this, JSON.parse(json))
     }
 
-    set_theme() {
-        document.documentElement.setAttribute('data-bs-theme', this.theme);
+    save() {
+        localStorage.setItem(CONFIG_KEY, JSON.stringify(this));
+    }
+    
+    populate() {
+        inputHandle.value = this.handle;
+        inputRpmMin.value = this.rpm_min;
+        inputRpmMax.value = this.rpm_max;
+        inputRpmIdle.value = this.rpm_idle;
+        inputRpmRedline.value = this.rpm_redline;
+        inputRpmPowerband.value = this.rpm_powerband;
+
+        document.getElementById('handle').textContent = inputHandle.value;
     }
 
-    set_handle() {
-        document.getElementById('handle').textContent = this.handle
+    update() {
+        this.handle = inputHandle.value
+        this.rpm_min = Number(inputRpmMin.value)
+        this.rpm_max = Number(inputRpmMax.value)
+        this.rpm_idle = Number(inputRpmIdle.value)
+        this.rpm_redline = Number(inputRpmRedline.value)
+        this.rpm_powerband = Number(inputRpmPowerband.value)
     }
 }
 
 const config = new Config();
+
+const alertSave = document.getElementById("alertSave");
+const buttonSave = document.getElementById('buttonSave').addEventListener('click', () => {
+    config.update();
+    config.save();
+    config.populate();
+
+    alertSave.classList.remove("d-none");
+    setTimeout(() => {
+        alertSave.classList.add("d-none");
+    }, 2000);
+})
 
 const chat = {
     coolant_temp: 0,
