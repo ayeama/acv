@@ -83,6 +83,7 @@ void twai_rx_task(void *arg) {
                     ((uint32_t)msg.data[4] << 16) |
                     ((uint32_t)msg.data[5] << 8) |
                     ((uint32_t)msg.data[6]);
+                continue;
             }
             if (
                 msg.ide &&
@@ -96,6 +97,7 @@ void twai_rx_task(void *arg) {
                     ((uint32_t)msg.data[4] << 16) |
                     ((uint32_t)msg.data[5] << 8) |
                     ((uint32_t)msg.data[6]);
+                continue;
             }
 
             // if (msg.id == 0x18 && !x18) {
@@ -177,34 +179,31 @@ void twai_rx_task(void *arg) {
                 (!msg.ide && (msg.id >= 0x7E8 && msg.id <= 0x7EF)) ||
                 (msg.ide && (msg.id >= 0x18DAF100 && msg.id <= 0x18DAF1FF))
             ) {
-                if (msg.data[1] == 0x41 && msg.data[2] == 0x05) {
-                    int8_t coolant_temp = msg.data[3] - 40;
-                    acv_msg_coolant_temp(coolant_temp);
-                    continue;
-                }
-                
-                if (msg.data[1] == 0x41 && msg.data[2] == 0x0C) {
-                    float rpm = ((msg.data[3] << 8) | msg.data[4]) / 4.0f;
-                    acv_msg_rpm(rpm);
-                    continue;
-                }
-
-                if (msg.data[1] == 0x41 && msg.data[2] == 0x0D) {
-                    int8_t speed = msg.data[3];
-                    acv_msg_speed(speed);
-                    continue;
-                }
-
-                if (msg.data[1] == 0x41 && msg.data[2] == 0x0F) {
-                    int8_t intake_air_temp = msg.data[3] - 40;
-                    acv_msg_intake_air_temp(intake_air_temp);
-                    continue;
-                }
-
-                if (msg.data[1] == 0x41 && msg.data[2] == 0x11) {
-                    float throttle_position = 0.392156863 * msg.data[3];
-                    acv_msg_throttle_position(throttle_position);
-                    continue;
+                if (msg.data[1] == 0x41) {
+                    switch (msg.data[2]) {
+                        case 0x05:
+                            int8_t coolant_temp = msg.data[3] - 40;
+                            acv_msg_coolant_temp(coolant_temp);
+                            continue;
+                        case 0x0C:
+                            uint16_t rpm = (((uint16_t)msg.data[3] << 8) | msg.data[4]) / 4;
+                            acv_msg_rpm(rpm);
+                            continue;
+                        case 0x0D:
+                            int8_t speed = msg.data[3];
+                            acv_msg_speed(speed);
+                            continue;
+                        case 0x0F:
+                            int8_t intake_air_temp = msg.data[3] - 40;
+                            acv_msg_intake_air_temp(intake_air_temp);
+                            continue;
+                        case 0x11:
+                            float throttle_position = 0.392156863 * msg.data[3];
+                            acv_msg_throttle_position(throttle_position);
+                            continue;
+                        default:
+                            continue;
+                    }
                 }
             }
         }

@@ -114,9 +114,6 @@ livestream.onmessage = (data) => {
 
 // TODO: use cookies to store feature flags? rpm smoothing, bike profiles etc.
 
-// -----------------------
-// PRELOAD
-// -----------------------
 function preloadImages() {
     let assets = ['/images/offline.webp', '/images/idle.webp', '/images/redline.webp'];
 
@@ -132,9 +129,6 @@ function preloadImages() {
 
 preloadImages();
 
-// -----------------------
-// DOM
-// -----------------------
 const img = document.getElementById('animation');
 
 const rpmText = document.getElementById('rpmText');
@@ -160,9 +154,6 @@ function setImage(src) {
     img.src = src;
 }
 
-// -----------------------
-// RENDER
-// -----------------------
 function percentage(min, max, value) {
     return ((value - min) / (max - min)) * 100;
 }
