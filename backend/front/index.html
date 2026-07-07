@@ -20,27 +20,28 @@
 <body>
   <div class="container-fluid px-0">
     <div class="row">
-      <div class="col-sm-3">
-        <div class="row">
-          <h2 class="mb-0 text-primary">DONATIONS</h2>
-        </div>
+      <div class="col-12 col-sm-3">
+        <div class="row row-cols-2 row-cols-sm-1">
+          <div class="col-auto">
+            <h2 class="mb-0 text-primary">DONATIONS</h2>
+          </div>
 
-        <div class="row">
-          <h2 id="rpmText" class="text-primary">$16,000</h2>
+          <div class="col">
+            <h2 id="rpmText" class="text-primary">$16,000</h2>
+          </div>
         </div>
       </div>
 
-      <div class="col-sm-9">
+      <div class="col-12 col-sm-9">
         <div class="py-2 h-100 w-100">
-          <div id="rpmProgress" class="progress h-100 rounded-0 bg-body" role="progressbar" aria-label="Tachometer"
-            aria-valuemin="0" aria-valuemax="18000" aria-valuenow="1350">
-            <div class="progress-bar bg-info" style="width: 75%"></div>
+          <div id="rpmProgress" class="progress h-100 rounded-0 bg-body" role="progressbar" aria-label="Tachometer" aria-valuemin="0" aria-valuemax="18000" aria-valuenow="1000">
+            <div class="progress-bar bg-info" style="width: 6%"></div>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="row gx-2">
+    <div class="row g-2">
       <div class="col-sm-7">
         <div class="h-100 p-1 border border-5 border-primary rounded-2">
           <div class="position-relative h-100">
@@ -62,13 +63,13 @@
               <p class="fs-2 mb-0 text-primary">LIVE CHAT</p>
             </div>
 
-            <!-- <div class="col-sm-auto">
-              <button type="button" class="btn btn-lg btn-outline text-primary">
+            <div class="col-auto">
+              <button type="button" class="btn btn-outline text-primary" data-bs-toggle="modal" data-bs-target="#settingsModal">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gear-fill" viewBox="0 0 16 16">
                   <path d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.169.311c.446.82.023 1.841-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 0 1 2.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 0 1 .872-2.105l.34-.1c1.4-.413 1.4-2.397 0-2.81l-.34-.1a1.464 1.464 0 0 1-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.169a1.464 1.464 0 0 1-2.105-.872zM8 10.93a2.929 2.929 0 1 1 0-5.86 2.929 2.929 0 0 1 0 5.858z"></path>
                 </svg>
               </button>
-            </div> -->
+            </div>
           </div>
 
           <div class="row">
@@ -167,7 +168,78 @@
     </div>
   </div>
 
+  <div id="settingsModal" class="modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Settings</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body">
+          <div id="alertSave" class="alert alert-success d-none" role="alert">
+            Settings saved
+          </div>
+
+          <div class="overflow-hidden">
+            <div class="row row-cols-2 row-cols-sm-3 gy-3 mb-3">
+              <div class="col">
+                <label for="inputHandle" class="form-label">Handle</label>
+                <input type="text" class="form-control" id="inputHandle">
+              </div>
+            </div>
+
+            <div class="row row-cols-2 row-cols-sm-3 gy-3 mb-3">
+              <div class="col">
+                <label for="inputRpmMin" class="form-label">RPM Minimum</label>
+                <input type="number" class="form-control" id="inputRpmMin">
+              </div>
+
+              <div class="col">
+                <label for="inputRpmMax" class="form-label">RPM Maximum</label>
+                <input type="number" class="form-control" id="inputRpmMax">
+              </div>
+
+              <div class="col">
+                <label for="inputRpmIdle" class="form-label">RPM Idle</label>
+                <input type="number" class="form-control" id="inputRpmIdle">
+              </div>
+
+              <div class="col">
+                <label for="inputRpmPowerband" class="form-label">RPM Powerband</label>
+                <input type="number" class="form-control" id="inputRpmPowerband">
+              </div>
+
+              <div class="col">
+                <label for="inputRpmRedline" class="form-label">RPM Redline</label>
+                <input type="number" class="form-control" id="inputRpmRedline">
+              </div>
+            </div>
+
+            <div class="row row-cols-2 row-cols-sm-3 gy-3 mb-3">
+              <div class="col">
+                <label for="inputThrottlePositionMin" class="form-label">Throttle Position Min</label>
+                <input type="number" class="form-control" id="inputThrottlePositionMin">
+              </div>
+
+              <div class="col">
+                <label for="inputThrottlePositionMax" class="form-label">Throttle Position Max</label>
+                <input type="number" class="form-control" id="inputThrottlePositionMax">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button id="buttonSave" type="button" class="btn btn-primary">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="/js/main.js"></script>
+  <script src="/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

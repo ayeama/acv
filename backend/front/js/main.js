@@ -1,27 +1,82 @@
+CONFIG_KEY = "acv.config"
+
+const inputHandle = document.getElementById('inputHandle');
+const inputRpmMin = document.getElementById('inputRpmMin');
+const inputRpmMax = document.getElementById('inputRpmMax');
+const inputRpmIdle = document.getElementById('inputRpmIdle');
+const inputRpmPowerband = document.getElementById('inputRpmPowerband');
+const inputRpmRedline = document.getElementById('inputRpmRedline');
+const inputThrottlePositionMin = document.getElementById('inputThrottlePositionMin');
+const inputThrottlePositionMax = document.getElementById('inputThrottlePositionMax');
+
 class Config {
-    theme = 'dark';
-    handle = '@zx4rr_gal';
-    rpm_min = 0;
-    rpm_max = 18000;
-    rpm_idle = 2500;
-    rpm_redline = 16000;
-    rpm_powerband = 12000;
-
     constructor() {
-        this.set_theme();
-        this.set_handle();
+        this.theme = 'dark';
+        this.handle = '@zx4rr_gal';
+        this.rpm_min = 0;
+        this.rpm_max = 18000;
+        this.rpm_idle = 2500;
+        this.rpm_powerband = 11500;
+        this.rpm_redline = 16000;
+        this.throttle_position_min = 12;
+        this.throttle_position_max = 44;
+
+        this.load()
+        this.populate()
+    }
+    
+    load() {
+        const json = localStorage.getItem(CONFIG_KEY)
+        
+        if (!json) {
+            return;
+        }
+        
+        Object.assign(this, JSON.parse(json))
     }
 
-    set_theme() {
-        document.documentElement.setAttribute('data-bs-theme', this.theme);
+    save() {
+        localStorage.setItem(CONFIG_KEY, JSON.stringify(this));
+    }
+    
+    populate() {
+        inputHandle.value = this.handle;
+        inputRpmMin.value = this.rpm_min;
+        inputRpmMax.value = this.rpm_max;
+        inputRpmIdle.value = this.rpm_idle;
+        inputRpmPowerband.value = this.rpm_powerband;
+        inputRpmRedline.value = this.rpm_redline;
+        inputThrottlePositionMin.value = this.throttle_position_min;
+        inputThrottlePositionMax.value = this.throttle_position_max;
+
+        document.getElementById('handle').textContent = inputHandle.value;
     }
 
-    set_handle() {
-        document.getElementById('handle').textContent = this.handle
+    update() {
+        this.handle = inputHandle.value
+        this.rpm_min = Number(inputRpmMin.value)
+        this.rpm_max = Number(inputRpmMax.value)
+        this.rpm_idle = Number(inputRpmIdle.value)
+        this.rpm_powerband = Number(inputRpmPowerband.value)
+        this.rpm_redline = Number(inputRpmRedline.value)
+        this.throttle_position_min = Number(inputThrottlePositionMin.value)
+        this.throttle_position_max = Number(inputThrottlePositionMax.value)
     }
 }
 
 const config = new Config();
+
+const alertSave = document.getElementById("alertSave");
+const buttonSave = document.getElementById('buttonSave').addEventListener('click', () => {
+    config.update();
+    config.save();
+    config.populate();
+
+    alertSave.classList.remove("d-none");
+    setTimeout(() => {
+        alertSave.classList.add("d-none");
+    }, 2000);
+})
 
 const chat = {
     coolant_temp: 0,
@@ -114,9 +169,6 @@ livestream.onmessage = (data) => {
 
 // TODO: use cookies to store feature flags? rpm smoothing, bike profiles etc.
 
-// -----------------------
-// PRELOAD
-// -----------------------
 function preloadImages() {
     let assets = ['/images/offline.webp', '/images/idle.webp', '/images/redline.webp'];
 
@@ -132,9 +184,6 @@ function preloadImages() {
 
 preloadImages();
 
-// -----------------------
-// DOM
-// -----------------------
 const img = document.getElementById('animation');
 
 const rpmText = document.getElementById('rpmText');
@@ -160,9 +209,6 @@ function setImage(src) {
     img.src = src;
 }
 
-// -----------------------
-// RENDER
-// -----------------------
 function percentage(min, max, value) {
     return ((value - min) / (max - min)) * 100;
 }
@@ -209,11 +255,8 @@ function render_intake_air_temp() {
 }
 
 function render_throttle_position() {
-    // TODO
-    // const throttle_position_min = 0;
-    // const throttle_position_max = 100;
-    const throttle_position_min = 12;
-    const throttle_position_max = 44;
+    const throttle_position_min = config.throttle_position_min;
+    const throttle_position_max = config.throttle_position_max;
 
     throttlePositionText.textContent = `${Math.round(chat.throttle_position)}`;
     throttlePositionProgress.setAttribute('aria-valuenow', `${chat.throttle_position}`);
@@ -234,7 +277,6 @@ function render_animation() {
         return;
     }
 
-    // TODO update powerband?
     const frames = 16;
     let normalized = (chat.rpm - config.rpm_idle) / (config.rpm_powerband - config.rpm_idle);
     normalized = Math.max(0, Math.min(1, normalized));

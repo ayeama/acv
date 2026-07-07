@@ -1,4 +1,6 @@
-#include "freertos/FreeRTOS.h"
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdio.h>
 
 #include <acv.h>
 
@@ -11,7 +13,7 @@ void acv_msg_coolant_temp(int8_t coolant_temp) {
     }
 }
 
-void acv_msg_rpm(float rpm) {
+void acv_msg_rpm(uint16_t rpm) {
     if (rpm != acv_msg.rpm) {
         acv_msg.rpm = rpm;
         acv_msg.updated = true;
@@ -43,7 +45,7 @@ void acv_msg_string(char *buf, size_t size) {
     snprintf(
         buf,
         size,
-        "{\"coolant_temp\":%d,\"rpm\":%f,\"speed\":%d,\"intake_air_temp\":%d,\"throttle_position\":%f}",
+        "{\"coolant_temp\":%d,\"rpm\":%u,\"speed\":%d,\"intake_air_temp\":%d,\"throttle_position\":%f}",
         acv_msg.coolant_temp,
         acv_msg.rpm,
         acv_msg.speed,
